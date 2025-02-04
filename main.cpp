@@ -17,7 +17,7 @@ size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* out
 
 void showHelp() {
     std::cout << "Uso:\n"
-              << "  ./cambio <MOEDA_ORIGEM> <MOEDA_DESTINO>  - Obter taxa de câmbio\n"
+              << "  ./cambio -get <MOEDA_ORIGEM-MOEDA_DESTINO>  - Obter taxa de câmbio\n"
               << "  ./cambio -list                           - Listar todas as conversões disponíveis\n"
               << "  ./cambio -list -<MOEDA>                  - Listar conversões disponíveis para uma moeda específica (ex: -Real-Brasileiro)\n"
               << "  ./cambio -list <MOEDA_ORIGEM/MOEDA_DESTINO> - Verificar se uma conversão específica está disponível (ex: Real-Brasileiro/Dólar-Americano)\n"
