@@ -25,6 +25,42 @@ void showHelp() {
 }
 
 
+void getExchangeRate(const std::string& pair) {
+    CURL* curl;
+    CURLcode res;
+    std::string readBuffer;
+    std::string url = "https://economia.awesomeapi.com.br/json/last/" + pair;
+
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            std::cerr << "Erro ao buscar taxa de câmbio: " << curl_easy_strerror(res) << std::endl;
+        } else {
+            try {
+                json jsonData = json::parse(readBuffer);
+                std::string key = pair;
+                key.erase(std::remove(key.begin(), key.end(), '-'), key.end());
+
+                if (jsonData.contains(key)) {
+                    std::cout << "Taxa de câmbio " << pair << ": " << jsonData[key]["bid"] << std::endl;
+                } else {
+                    std::cout << "Não foi possível encontrar a taxa de câmbio para " << pair << std::endl;
+                }
+            } catch (const json::exception& e) {
+                std::cerr << "Erro ao interpretar JSON: " << e.what() << std::endl;
+            }
+        }
+
+        curl_easy_cleanup(curl);
+    }
+}
+
+
 void listAvailableConversions(const std::string& filterCurrency = "", const std::string& targetCurrency = "") {
     CURL* curl;
     CURLcode res;
@@ -124,7 +160,9 @@ int main(int argc, char* argv[]) {
             } else {
                 std::cerr << "Formato inválido! Use -list -<MOEDA> para listar opções ou <MOEDA_ORIGEM/MOEDA_DESTINO> para verificar conversão.\n";
             }
-        }
+        } else if(arg1 == "-get"){
+            getExchangeRate(argv[2]);
+        } 
         else {
             std::cerr << "Número de argumentos inválido! Use -help para ver as opções.\n";
         }
